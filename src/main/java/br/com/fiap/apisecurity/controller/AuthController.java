@@ -1,9 +1,11 @@
 package br.com.fiap.apisecurity.controller;
 
 import br.com.fiap.apisecurity.dto.AuthDTO;
+import br.com.fiap.apisecurity.dto.LoginResponseDTO;
 import br.com.fiap.apisecurity.dto.RegisterDTO;
 import br.com.fiap.apisecurity.entity.Usuario;
 import br.com.fiap.apisecurity.repository.UsuarioRepository;
+import br.com.fiap.apisecurity.service.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +20,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final UsuarioRepository usuarioRepository;
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager,
-                          UsuarioRepository usuarioRepository) {
-        this.authenticationManager = authenticationManager;
-        this.usuarioRepository = usuarioRepository;
-    }
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthDTO authDTO) {
-        // Gera um token para esse usuário e senha
+        // Gera um token do tipo UserPasswordAuthentication para esse usuário e senha
         var userPwd = new UsernamePasswordAuthenticationToken(
                 authDTO.login(),
                 authDTO.senha()
         );
-        // Autentica o token
+        // Autentica o usuário
         var auth = this.authenticationManager.authenticate(userPwd);
-        return ResponseEntity.ok().build();
+        // Gera um token JWT
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
