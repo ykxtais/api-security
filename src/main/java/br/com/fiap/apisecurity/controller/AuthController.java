@@ -1,7 +1,6 @@
 package br.com.fiap.apisecurity.controller;
 
 import br.com.fiap.apisecurity.dto.AuthDTO;
-import br.com.fiap.apisecurity.dto.LoginResponseDTO;
 import br.com.fiap.apisecurity.dto.RegisterDTO;
 import br.com.fiap.apisecurity.entity.Usuario;
 import br.com.fiap.apisecurity.repository.UsuarioRepository;
